@@ -15,4 +15,7 @@ abstract class AppSvgIcons {
   static const bottomNavigationBarCart =
       '${_basePath}bottom_navigation_bar_cart.svg';
 
+  /// icons for HomeScreen
+  static const logout = '${_basePath}logout.svg';
+  static const logoutBackground = '${_basePath}logout_background.svg';
 }
