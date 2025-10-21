@@ -1,22 +1,61 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:e_commerce_app/core/theme/app_svg_icons.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../product/bloc/product_bloc.dart';
+import '../../product/bloc/product_event.dart';
+import '../../product/bloc/product_state.dart';
 import '../widgets/product_cart_widget.dart';
 
 @RoutePage()
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  final _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<ProductBloc>().add(const LoadProductsEvent());
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 100) {
+      final bloc = context.read<ProductBloc>();
+      bloc.state.maybeWhen(
+        loaded: (products, hasMore) {
+          if (hasMore) bloc.add(const LoadMoreProductsEvent());
+        },
+        orElse: () {},
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
       body: SafeArea(
-        child: SingleChildScrollView(
+        child: Padding(
           padding: EdgeInsets.all(16.w),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -87,60 +126,45 @@ class HomeScreen extends StatelessWidget {
 
               SizedBox(height: 22.h),
 
-              Column(
-                children: [
-                  ProductCartWidget(
-                    imageUrl:
-                        'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=200&h=200&fit=crop',
-                    title: '"Awaken, My Love!"',
-                    artist: 'Childish Gambino',
-                    rating: 4.25,
-                    price: '\$19.99',
-                    isFavorite: true,
-                  ),
-
-                  ProductCartWidget(
-                    imageUrl:
-                        'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=200&h=200&fit=crop',
-                    title: 'Dark Lane Tapes',
-                    artist: 'Drake',
-                    rating: 4.25,
-                    price: '\$32.99',
-                    isFavorite: false,
-                  ),
-
-                  ProductCartWidget(
-                    imageUrl:
-                        'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=200&h=200&fit=crop',
-                    title: '4 Your Eyez Only',
-                    artist: 'JCole',
-                    rating: 4.25,
-                    price: '\$28.99',
-                    isFavorite: false,
-                  ),
-
-                  ProductCartWidget(
-                    imageUrl:
-                        'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=200&h=200&fit=crop',
-                    title: '4 Your Eyez Only',
-                    artist: 'JCole',
-                    rating: 4.25,
-                    price: '\$28.99',
-                    isFavorite: false,
-                  ),
-
-                  ProductCartWidget(
-                    imageUrl:
-                        'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=200&h=200&fit=crop',
-                    title: '4 Your Eyez Only',
-                    artist: 'JCole',
-                    rating: 4.25,
-                    price: '\$28.99',
-                    isFavorite: false,
-                  ),
-                ],
+              //
+              Expanded(
+                child: BlocBuilder<ProductBloc, ProductState>(
+                  builder: (context, state) {
+                    return state.when(
+                      initial: () => const SizedBox.shrink(),
+                      loading:
+                          () =>
+                              const Center(child: CircularProgressIndicator()),
+                      loaded:
+                          (products, hasMore) => ListView.builder(
+                            controller: _scrollController,
+                            itemCount:
+                                hasMore ? products.length + 1 : products.length,
+                            itemBuilder: (context, index) {
+                              if (index >= products.length) {
+                                return const Center(
+                                  child: CircularProgressIndicator(),
+                                );
+                              }
+                              final product = products[index];
+                              return ProductCartWidget(
+                                imageUrl: product.image,
+                                title: product.title,
+                                artist: product.category,
+                                rating: product.rating.rate,
+                                price: '\$${product.price.toStringAsFixed(2)}',
+                                isFavorite: false,
+                              );
+                            },
+                          ),
+                      error:
+                          (message) => Center(child: Text('Error: $message')),
+                    );
+                  },
+                ),
               ),
-              SizedBox(height: 100.h), // Space for bottom navigation
+
+              // SizedBox(height: 100.h),
             ],
           ),
         ),

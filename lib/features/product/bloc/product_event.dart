@@ -1,4 +1,10 @@
-part of 'product_bloc.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-@immutable
-sealed class ProductEvent {}
+part 'product_event.freezed.dart';
+
+@freezed
+class ProductEvent with _$ProductEvent {
+  const factory ProductEvent.loadProducts() = LoadProductsEvent;
+
+  const factory ProductEvent.loadMoreProducts() = LoadMoreProductsEvent;
+}

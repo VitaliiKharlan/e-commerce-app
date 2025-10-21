@@ -41,7 +41,7 @@ class ProductCartWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: EdgeInsets.only(left: 21, top: 25, right: 21, bottom: 26),
+            padding: EdgeInsets.only(left: 21.w, top: 25.h, right: 21.w, bottom: 26.h),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(4.r),
               child: Image.network(
@@ -69,37 +69,38 @@ class ProductCartWidget extends StatelessWidget {
               padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 16.w),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                // mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            title,
-                            style: GoogleFonts.urbanist(
-                              fontSize: 16.sp,
-                              fontWeight: FontWeight.w600,
-                              color: const Color(0xFF000000),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              title,
+                              style: GoogleFonts.urbanist(
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.w600,
+                                color: const Color(0xFF000000),
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-
-                          SizedBox(height: 2.h),
-
-                          Text(
-                            artist,
-                            style: GoogleFonts.urbanist(
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.w600,
-                              color: const Color(0xFF000000).withAlpha(120),
+                        
+                            SizedBox(height: 2.h),
+                        
+                            Text(
+                              artist,
+                              style: GoogleFonts.urbanist(
+                                fontSize: 12.sp,
+                                fontWeight: FontWeight.w600,
+                                color: const Color(0xFF000000).withAlpha(120),
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                       Icon(
                         isFavorite ? Icons.favorite : Icons.favorite_border,

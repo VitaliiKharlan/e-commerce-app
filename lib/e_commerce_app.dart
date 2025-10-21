@@ -7,6 +7,7 @@ import 'core/logger/i_logger_service.dart';
 import 'core/router/router.dart';
 import 'features/auth/bloc/auth_bloc.dart';
 import 'features/auth/repository/i_auth_repository.dart';
+import 'features/product/bloc/product_bloc.dart';
 
 
 class ECommerceApp extends StatelessWidget {
@@ -16,8 +17,15 @@ class ECommerceApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<AuthBloc>(
-      create: (_) => AuthBloc(sl<IAuthRepository>(), sl<ILoggerService>()),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<AuthBloc>(
+          create: (_) => AuthBloc(sl<IAuthRepository>(), sl<ILoggerService>()),
+        ),
+        BlocProvider<ProductBloc>(
+          create: (_) => sl<ProductBloc>(),
+        ),
+      ],
       child: ScreenUtilInit(
         designSize: const Size(375, 812),
         minTextAdapt: true,
